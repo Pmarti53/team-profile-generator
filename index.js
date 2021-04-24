@@ -139,7 +139,7 @@ const employeeQuestions = [
             return true;
         }
     },
-    
+
     {
         type: "confirm",
         name: "add team member",
@@ -159,9 +159,43 @@ function TeamBuild() {
         if (employeeInfo.addTeam === "yes") {
             TeamBuild();
         } else {
-            // htmlBuild();
+            htmlBuild();
         }
     })
+}
+
+function CardBuild(memberType, name, id, email, propertyValue) {
+    let data = fs.readFileSync(`./templates/${memberType}.html`, 'utf-8')
+    data = data.replace("name", name);
+    data = data.replace("id", `ID: ${id}`);
+    data = data.replace("email", `Email: <a href="mailto:${email}</a>`);
+    data = data.replace("property", propertyValue);
+    fs.appendFileSync("success.html", data, err => { if (err) throw err; });
+}
+
+function htmlBuild() {
+    let newFile = fs.readFileSync("./templates/main.html")
+    if (!fs.existsSync(OUTPUT_DIR)) {
+        fs.mkdirSync(OUTPUT_DIR)
+    }
+    fs.writeFileSync(outputPath, render(Team), "UTF-8")
+
+
+    console.log(Team)
+
+    for (member of Team) {
+        if (member.getRole() == "Manager") {
+            CardBuild("manager", member.getName(), member.getId(), member.getEmail(), "Office: " + member.getOfficeNumber());
+        } else if (member.getRole() == "Engineer") {
+            CardBuild("engineer", member.getName(), member.getId(), member.getEmail(), "Github: " + member.getGithub());
+        } else if (member.getRole() == "Intern") {
+            CardBuild("intern", member.getName(), member.getId(), member.getEmail(), "School: " + member.getSchool());
+        }
+    }
+    fs.appendFileSync("success.html", "</div></main></body></html>", function (err) {
+        if (err) throw err;
+    });
+
 }
 
 
@@ -176,7 +210,7 @@ function init() {
         if (managerInfo.teamConfirm === "yes") {
             TeamBuild();
         } else {
-            // htmlBuild();
+            htmlBuild();
         }
     })
 }
