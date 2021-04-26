@@ -176,7 +176,7 @@ function CardBuild(memberType, name, id, email, propertyValue) {
     data = data.replace("id", `ID: ${id}`);
     data = data.replace("email", `Email: <a href="mailto:${email}</a>`);
     data = data.replace("property", propertyValue);
-    fs.appendFileSync("teamfile.html", data, err => { if (err) throw err; });
+    fs.appendFileSync("team.html", data, err => { if (err) throw err; });
 }
 
 function htmlBuild() {
@@ -198,7 +198,7 @@ function htmlBuild() {
             CardBuild("intern", member.getName(), member.getId(), member.getEmail(), "School: " + member.getSchool());
         }
     }
-    fs.appendFileSync("teamfile.html", "</div></main></body></html>", function (err) {
+    fs.appendFileSync("team.html", "</div></main></body></html>", function (err) {
         if (err) throw err;
     });
 
