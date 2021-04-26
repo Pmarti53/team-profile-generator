@@ -52,7 +52,7 @@ const managerQuestions = [
 
     {
         type: "input",
-        name: "officeNum",
+        name: "officeNumber",
         message: "Please enter your office Number",
         validate: async (input) => {
             if (isNaN(input)) {
