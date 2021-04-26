@@ -6,7 +6,7 @@ const inquirer = require("inquirer");
 const path = require("path");
 const fs = require("fs");
 
-const OUTPUT_DIR = path.resolve(__dirname, "output");
+const OUTPUT_DIR = path.resolve(__dirname, "dist");
 const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./lib/htmlRender");
@@ -52,7 +52,7 @@ const managerQuestions = [
 
     {
         type: "input",
-        name: "office number",
+        name: "officeNum",
         message: "Please enter your office Number",
         validate: async (input) => {
             if (isNaN(input)) {
@@ -60,6 +60,12 @@ const managerQuestions = [
             }
             return true;
         }
+    },
+    {
+        type: "list",
+        name: "teamConfirm",
+        message: "Do you have a team?",
+        choices: ["Yes", "No"]
     },
 ]
 
@@ -142,7 +148,7 @@ const employeeQuestions = [
 
     {
         type: "confirm",
-        name: "add team member",
+        name: "addTeam",
         message: "Add another team member?",
         choices: ["Yes, No"]
     }
@@ -156,7 +162,7 @@ function TeamBuild() {
             var newMember = new Intern(employeeInfo.name, employeeInfo.length, employeeInfo.email, employeeInfo.school);
         }
         Team.push(newMember);
-        if (employeeInfo.addTeam === "yes") {
+        if (employeeInfo.addTeam === "Yes") {
             TeamBuild();
         } else {
             htmlBuild();
@@ -165,16 +171,16 @@ function TeamBuild() {
 }
 
 function CardBuild(memberType, name, id, email, propertyValue) {
-    let data = fs.readFileSync(`./templates/${memberType}.html`, 'utf-8')
+    let data = fs.readFileSync(`./src/${memberType}.html`, 'utf-8')
     data = data.replace("name", name);
     data = data.replace("id", `ID: ${id}`);
     data = data.replace("email", `Email: <a href="mailto:${email}</a>`);
     data = data.replace("property", propertyValue);
-    fs.appendFileSync("success.html", data, err => { if (err) throw err; });
+    fs.appendFileSync("teamfile.html", data, err => { if (err) throw err; });
 }
 
 function htmlBuild() {
-    let newFile = fs.readFileSync("./templates/main.html")
+    let newFile = fs.readFileSync("./src/main.html")
     if (!fs.existsSync(OUTPUT_DIR)) {
         fs.mkdirSync(OUTPUT_DIR)
     }
@@ -192,22 +198,17 @@ function htmlBuild() {
             CardBuild("intern", member.getName(), member.getId(), member.getEmail(), "School: " + member.getSchool());
         }
     }
-    fs.appendFileSync("success.html", "</div></main></body></html>", function (err) {
+    fs.appendFileSync("teamfile.html", "</div></main></body></html>", function (err) {
         if (err) throw err;
     });
 
 }
 
-
-
-
-
-
 function init() {
     inquirer.prompt(managerQuestions).then(managerInfo => {
-        let teamManager = new Manager(managerInfo.name, 1, managerInfo.email, managerInfo.officeNumber);
+        let teamManager = new Manager(managerInfo.name, managerInfo.id, managerInfo.email, managerInfo.officeNumber);
         Team.push(teamManager);
-        if (managerInfo.teamConfirm === "yes") {
+        if (managerInfo.teamConfirm === "Yes") {
             TeamBuild();
         } else {
             htmlBuild();
@@ -216,3 +217,8 @@ function init() {
 }
 
 init();
+
+
+
+
+
